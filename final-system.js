@@ -355,15 +355,15 @@ function addFinalUI() {
   `;
   document.head.appendChild(style);
   
-  // Insert after multiplayer panel
-  const multiplayerPanel = document.getElementById('multiplayer-panel');
-  if (multiplayerPanel) {
-    multiplayerPanel.insertAdjacentHTML('afterend', finalHTML);
-  } else {
-    gameContainer.insertAdjacentHTML('beforeend', finalHTML);
-  }
+  // Insert at the end of game container
+  gameContainer.insertAdjacentHTML('beforeend', finalHTML);
   
   setupFinalEvents();
+  
+  // Hide panels initially if not logged in
+  if (!window.currentUser) {
+    document.getElementById('final-tabs').style.display = 'none';
+  }
 }
 
 // ===========================================
@@ -545,6 +545,16 @@ function getRankColor(rank) {
 // ===========================================
 
 function startChatUpdates() {
+  if (!window.currentUser) {
+    document.getElementById('chat-room-indicator').textContent = 'Login to chat';
+    document.getElementById('chat-messages').innerHTML = `
+      <div style="text-align: center; color: #bdc3c7; padding: 20px;">
+        Please login to chat
+      </div>
+    `;
+    return;
+  }
+  
   if (!window.currentRoom) {
     document.getElementById('chat-room-indicator').textContent = 'Not in room';
     document.getElementById('chat-messages').innerHTML = `
@@ -888,6 +898,9 @@ document.addEventListener('DOMContentLoaded', () => {
   const originalStartSession = window.startUserSession;
   window.startUserSession = function() {
     if (originalStartSession) originalStartSession();
+    // Show final tabs after login
+    const finalTabs = document.getElementById('final-tabs');
+    if (finalTabs) finalTabs.style.display = 'flex';
     resetLeaderboard();
     loadLeaderboard();
   };
@@ -897,6 +910,9 @@ document.addEventListener('DOMContentLoaded', () => {
   window.handleLogout = function() {
     stopChatUpdates();
     if (originalLogout) originalLogout();
+    // Hide final tabs after logout
+    const finalTabs = document.getElementById('final-tabs');
+    if (finalTabs) finalTabs.style.display = 'none';
   };
   
   // Monitor room changes for chat
@@ -931,4 +947,10 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     return result;
   };
+  
+  // If already logged in, show tabs
+  if (window.currentUser) {
+    const finalTabs = document.getElementById('final-tabs');
+    if (finalTabs) finalTabs.style.display = 'flex';
+  }
 });
