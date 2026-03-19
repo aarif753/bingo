@@ -500,6 +500,13 @@ async function handleLogout() {
     // Hide user panel
     document.getElementById('user-panel').style.display = 'none';
     
+    // Hide social and multiplayer panels
+    const socialPanel = document.getElementById('social-panel');
+    if (socialPanel) socialPanel.style.display = 'none';
+    
+    const multiplayerPanel = document.getElementById('multiplayer-panel');
+    if (multiplayerPanel) multiplayerPanel.style.display = 'none';
+    
     // Reset game status
     const gameStatus = document.getElementById('game-status');
     if (gameStatus) {
@@ -529,6 +536,25 @@ function startUserSession() {
   const gameStatus = document.getElementById('game-status');
   if (gameStatus) {
     gameStatus.textContent = `${currentUser.username}, click "Your Player" to begin`;
+  }
+  
+  // Show social and multiplayer panels
+  const socialPanel = document.getElementById('social-panel');
+  if (socialPanel) {
+    socialPanel.style.display = 'block';
+    // Trigger social system initialization
+    if (typeof startSocialSystem === 'function') {
+      startSocialSystem();
+    }
+  }
+  
+  const multiplayerPanel = document.getElementById('multiplayer-panel');
+  if (multiplayerPanel) {
+    multiplayerPanel.style.display = 'block';
+    // Trigger multiplayer system initialization
+    if (typeof fetchRooms === 'function') {
+      fetchRooms();
+    }
   }
   
   // Start periodic status update (every 30 seconds)
